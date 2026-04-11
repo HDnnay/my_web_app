@@ -1,0 +1,523 @@
+"""
+The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response.
+"""
+directive @cost(
+  """
+  The `weight` argument defines what value to add to the overall cost for every appearance, or possible appearance, of a type, field, argument, etc.
+  """
+  weight: String!
+) on ARGUMENT_DEFINITION | ENUM | FIELD_DEFINITION | INPUT_FIELD_DEFINITION | OBJECT | SCALAR
+
+"""
+The purpose of the `@listSize` directive is to either inform the static analysis about the size of returned lists (if that information is statically available), or to point the analysis to where to find that information.
+"""
+directive @listSize(
+  """
+  The `assumedSize` argument can be used to statically define the maximum length of a list returned by a field.
+  """
+  assumedSize: Int
+
+  """
+  The `requireOneSlicingArgument` argument can be used to inform the static analysis that it should expect that exactly one of the defined slicing arguments is present in a query. If that is not the case (i.e., if none or multiple slicing arguments are present), the static analysis may throw an error.
+  """
+  requireOneSlicingArgument: Boolean! = true
+
+  """
+  The `sizedFields` argument can be used to define that the value of the `assumedSize` argument or of a slicing argument does not affect the size of a list returned by a field itself, but that of a list returned by one of its sub-fields.
+  """
+  sizedFields: [String!]
+
+  """
+  The `slicingArgumentDefaultValue` argument can be used to define a default value for a slicing argument, which is used if the argument is not present in a query.
+  """
+  slicingArgumentDefaultValue: Int
+
+  """
+  The `slicingArguments` argument can be used to define which of the field's arguments with numeric type are slicing arguments, so that their value determines the size of the list returned by that field. It may specify a list of multiple slicing arguments.
+  """
+  slicingArguments: [String!]
+) on FIELD_DEFINITION
+
+type AppArticleCommentDto {
+  comment: String
+  createTiem: DateTime
+  id: ID
+  isVisiable: Boolean
+  userId: ID
+}
+
+type AppArticleDto {
+  comments: [AppArticleCommentDto]
+  content: String
+  createTiem: DateTime
+  createUser: AppUserDto
+  id: ID
+  isVisiable: Boolean
+  subtitle: String
+  tags: [AppTagDto]
+  title: String
+  topic: String
+  userId: ID
+}
+
+type AppMenuDto {
+  childMenus: [AppMenuDto]
+  createdAt: DateTime
+  icon: String
+  id: ID
+  name: String
+  order: Int
+  parentId: ID
+  path: String
+  updatedAt: DateTime
+}
+
+type AppPermissionDto {
+  childPermissions: [AppPermissionDto]
+  code: String!
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  name: String!
+  parentId: ID
+  roles: [AppRoleDto!]
+  updatedAt: DateTime
+}
+
+type AppRoleDto {
+  code: String!
+  createdAt: DateTime!
+  description: String
+  id: ID!
+  isDisabled: Boolean!
+  name: String!
+  permissions: [AppPermissionDto]
+  updatedAt: DateTime
+}
+
+type AppTagDto {
+  id: ID
+  name: String
+}
+
+type AppUserDto {
+  email: String!
+  id: ID!
+  isDisabled: Boolean!
+  name: String!
+  roles: [AppRoleDto]
+  userType: String!
+}
+
+input ArticleCommentDtoFilterInput {
+  and: [ArticleCommentDtoFilterInput!]
+  comment: StringOperationFilterInput
+  createTiem: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  isVisiable: BooleanOperationFilterInput
+  or: [ArticleCommentDtoFilterInput!]
+  userId: UuidOperationFilterInput
+}
+
+input ArticleDtoFilterInput {
+  and: [ArticleDtoFilterInput!]
+  comments: ListFilterInputTypeOfArticleCommentDtoFilterInput
+  content: StringOperationFilterInput
+  createTiem: DateTimeOperationFilterInput
+  createUser: UserDtoFilterInput
+  id: UuidOperationFilterInput
+  isVisiable: BooleanOperationFilterInput
+  or: [ArticleDtoFilterInput!]
+  subtitle: StringOperationFilterInput
+  tags: ListFilterInputTypeOfTagDtoFilterInput
+  title: StringOperationFilterInput
+  topic: StringOperationFilterInput
+  userId: UuidOperationFilterInput
+}
+
+input ArticleDtoSortInput {
+  content: SortEnumType
+  createTiem: SortEnumType
+  createUser: UserDtoSortInput
+  id: SortEnumType
+  isVisiable: SortEnumType
+  subtitle: SortEnumType
+  title: SortEnumType
+  topic: SortEnumType
+  userId: SortEnumType
+}
+
+"""A connection to a list of items."""
+type ArticlesConnection {
+  """A list of edges."""
+  edges: [ArticlesEdge!]
+
+  """A flattened list of the nodes."""
+  nodes: [AppArticleDto!]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type ArticlesEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: AppArticleDto!
+}
+
+input BooleanOperationFilterInput {
+  eq: Boolean
+  neq: Boolean
+}
+
+input CreateArticleCommandInput {
+  content: String!
+  isVisiable: Boolean!
+  subtitle: String
+  tagIds: [UUID!]
+  title: String!
+  topic: String
+  userId: UUID!
+}
+
+input CreateMenuCommandInput {
+  icon: String
+  name: String!
+  order: Int
+  parentId: ID
+  path: String
+}
+
+input CreateRoleCommandInput {
+  code: String!
+  description: String
+  name: String!
+  permissionIds: [ID]
+}
+
+input CreateUserCommandInput {
+  email: String!
+  name: String!
+  userType: String!
+}
+
+"""The `DateTime` scalar represents an ISO-8601 compliant date time type."""
+scalar DateTime
+
+input DateTimeOperationFilterInput {
+  eq: DateTime
+  gt: DateTime
+  gte: DateTime
+  in: [DateTime]
+  lt: DateTime
+  lte: DateTime
+  neq: DateTime
+  ngt: DateTime
+  ngte: DateTime
+  nin: [DateTime]
+  nlt: DateTime
+  nlte: DateTime
+}
+
+input ListFilterInputTypeOfArticleCommentDtoFilterInput {
+  all: ArticleCommentDtoFilterInput
+  any: Boolean
+  none: ArticleCommentDtoFilterInput
+  some: ArticleCommentDtoFilterInput
+}
+
+input ListFilterInputTypeOfPermissionDtoFilterInput {
+  all: PermissionDtoFilterInput
+  any: Boolean
+  none: PermissionDtoFilterInput
+  some: PermissionDtoFilterInput
+}
+
+input ListFilterInputTypeOfRoleDtoFilterInput {
+  all: RoleDtoFilterInput
+  any: Boolean
+  none: RoleDtoFilterInput
+  some: RoleDtoFilterInput
+}
+
+input ListFilterInputTypeOfTagDtoFilterInput {
+  all: TagDtoFilterInput
+  any: Boolean
+  none: TagDtoFilterInput
+  some: TagDtoFilterInput
+}
+
+type Mutation {
+  assignPermissionsToMenu(id: UUID!, permissionIds: [UUID!]!): SuccessResponse!
+  assignPermissionsToRole(id: UUID!, permissionIds: [UUID!]!): SuccessResponse!
+  assignRolesToUser(id: UUID!, roleIds: [UUID!]!): SuccessResponse!
+  createArticle(command: CreateArticleCommandInput!): AppArticleDto!
+  createMenu(command: CreateMenuCommandInput!): AppMenuDto!
+  createRole(command: CreateRoleCommandInput!): AppRoleDto!
+  createUser(command: CreateUserCommandInput!): UUID!
+  deleteArticle(id: UUID!): SuccessResponse!
+  deleteMenu(id: UUID!): SuccessResponse!
+  deleteRole(id: UUID!): SuccessResponse!
+  deleteUser(id: UUID!): SuccessResponse!
+  updateArticle(command: UpdateArticleCommandInput!, id: UUID!): AppArticleDto!
+  updateMenu(command: UpdateMenuCommandInput!, id: UUID!): AppMenuDto!
+  updateRole(command: UpdateRoleCommandInput!, id: UUID!): AppRoleDto!
+  updateUser(command: UpdateUserCommandInput!, id: UUID!): AppUserDto!
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+
+  """
+  Indicates whether more edges exist following the set defined by the clients arguments.
+  """
+  hasNextPage: Boolean!
+
+  """
+  Indicates whether more edges exist prior the set defined by the clients arguments.
+  """
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+}
+
+input PermissionDtoFilterInput {
+  and: [PermissionDtoFilterInput!]
+  childPermissions: ListFilterInputTypeOfPermissionDtoFilterInput
+  code: StringOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  description: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  or: [PermissionDtoFilterInput!]
+  parentId: UuidOperationFilterInput
+  roles: ListFilterInputTypeOfRoleDtoFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+type Query {
+  """获取文章详情"""
+  article(
+    """文章ID"""
+    id: UUID!
+  ): AppArticleDto
+
+  """获取文章列表"""
+  articles(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [ArticleDtoSortInput!]
+
+    """排序字段"""
+    sortBy: String
+
+    """是否降序排序"""
+    sortDescending: Boolean
+    where: ArticleDtoFilterInput
+  ): ArticlesConnection
+
+  """获取菜单详情"""
+  menu(
+    """菜单ID"""
+    id: UUID!
+  ): AppMenuDto
+
+  """获取菜单树形结构"""
+  menuTree: [AppMenuDto]
+
+  """获取权限列表"""
+  permissions: [AppPermissionDto]
+
+  """获取角色详情"""
+  role(
+    """角色ID"""
+    id: UUID!
+  ): AppRoleDto
+
+  """获取角色列表"""
+  roles: [AppRoleDto]
+
+  """获取用户详情"""
+  user(
+    """用户ID"""
+    id: UUID!
+  ): AppUserDto
+
+  """获取用户列表"""
+  users(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [UserDtoSortInput!]
+    where: UserDtoFilterInput
+  ): UsersConnection
+}
+
+input RoleDtoFilterInput {
+  and: [RoleDtoFilterInput!]
+  code: StringOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  description: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  isDisabled: BooleanOperationFilterInput
+  name: StringOperationFilterInput
+  or: [RoleDtoFilterInput!]
+  permissions: ListFilterInputTypeOfPermissionDtoFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+input StringOperationFilterInput {
+  and: [StringOperationFilterInput!]
+  contains: String
+  endsWith: String
+  eq: String
+  in: [String]
+  ncontains: String
+  nendsWith: String
+  neq: String
+  nin: [String]
+  nstartsWith: String
+  or: [StringOperationFilterInput!]
+  startsWith: String
+}
+
+type SuccessResponse {
+  message: String
+  success: Boolean!
+}
+
+input TagDtoFilterInput {
+  and: [TagDtoFilterInput!]
+  id: UuidOperationFilterInput
+  name: StringOperationFilterInput
+  or: [TagDtoFilterInput!]
+}
+
+scalar UUID
+
+input UpdateArticleCommandInput {
+  content: String!
+  id: UUID!
+  isVisiable: Boolean!
+  subtitle: String
+  tagIds: [UUID!]
+  title: String!
+  topic: String
+}
+
+input UpdateMenuCommandInput {
+  icon: String
+  id: UUID!
+  name: String!
+  order: Int
+  parentId: ID
+  path: String
+}
+
+input UpdateRoleCommandInput {
+  code: String!
+  description: String
+  name: String!
+  permissionIds: [ID]
+  roleId: UUID!
+}
+
+input UpdateUserCommandInput {
+  email: String!
+  id: UUID!
+  name: String!
+  userType: String!
+}
+
+input UserDtoFilterInput {
+  and: [UserDtoFilterInput!]
+  email: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  isDisabled: BooleanOperationFilterInput
+  name: StringOperationFilterInput
+  or: [UserDtoFilterInput!]
+  roles: ListFilterInputTypeOfRoleDtoFilterInput
+  userType: StringOperationFilterInput
+}
+
+input UserDtoSortInput {
+  email: SortEnumType
+  id: SortEnumType
+  isDisabled: SortEnumType
+  name: SortEnumType
+  userType: SortEnumType
+}
+
+"""A connection to a list of items."""
+type UsersConnection {
+  """A list of edges."""
+  edges: [UsersEdge!]
+
+  """A flattened list of the nodes."""
+  nodes: [AppUserDto!]
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type UsersEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+
+  """The item at the end of the edge."""
+  node: AppUserDto!
+}
+
+input UuidOperationFilterInput {
+  eq: UUID
+  gt: UUID
+  gte: UUID
+  in: [UUID]
+  lt: UUID
+  lte: UUID
+  neq: UUID
+  ngt: UUID
+  ngte: UUID
+  nin: [UUID]
+  nlt: UUID
+  nlte: UUID
+}

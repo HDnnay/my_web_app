@@ -1,0 +1,33 @@
+query GetMenuTree
+{
+  menuTree {
+    id
+    name
+    path
+    icon
+    order
+    parentId
+    createdAt
+    updatedAt
+    childMenus {
+      id
+      name
+      path
+      icon
+      order
+      parentId
+      createdAt
+      updatedAt
+      childMenus {
+        id
+        name
+        path
+        icon
+        order
+        parentId
+        createdAt
+        updatedAt
+    }
+    }
+  }
+}
