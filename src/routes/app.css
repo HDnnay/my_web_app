@@ -1,2 +1,27 @@
 @import '@fontsource/fira-mono';
 @import 'tailwindcss';
+
+/* 为 Tailwind v4 定义自定义颜色变量 */
+@theme{
+  --color-primary-50: #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #b9f8cf;
+  --color-primary-300: #7bf1a8;
+  --color-primary-400: #05df72;
+  --color-primary: #00c950;
+  --color-primary-600: #00a63e;
+  --color-primary-700: #008236;
+  --color-primary-800: #016630;
+  --color-primary-900: #0d542b;
+  
+  --color-secondary-50: #f7fee7;
+  --color-secondary-100: #ecfcca;
+  --color-secondary-200: #d8f999;
+  --color-secondary-300: #bbf451;
+  --color-secondary-400: #9ae600;
+  --color-secondary: #7ccf00;
+  --color-secondary-600: #5ea500;
+  --color-secondary-700: #497d00;
+  --color-secondary-800: #3c6300;
+  --color-secondary-900: #35530e;
+}
