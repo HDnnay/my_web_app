@@ -1,4 +1,0 @@
-{
-    "4662496b2d58aed79535ce1425b6017b9a12a6b2a16165b05ebeb7f5993f5d5a": "query GetMenuTree {\n  menuTree {\n    id\n    name\n    path\n    icon\n    order\n    parentId\n    createdAt\n    updatedAt\n    childMenus {\n      id\n      name\n      path\n      icon\n      order\n      parentId\n      createdAt\n      updatedAt\n      childMenus {\n        id\n        name\n        path\n        icon\n        order\n        parentId\n        createdAt\n        updatedAt\n      }\n    }\n  }\n}\n",
-    "869f4d4c0ad0a8d65e5f77315c1f55909967111aaebd0675b030ceed06185989": "query GetUsers($first: Int!, $after: String) {\n  users(first: $first, after: $after) {\n    nodes {\n      id\n      name\n      email\n      userType\n      isDisabled\n      roles {\n        id\n        name\n      }\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n    }\n    totalCount\n  }\n}\n"
-}
