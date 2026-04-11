@@ -8,7 +8,18 @@ const config = {
     "schemaPath": "./src/gql/app.graphql",
     "runtimeDir": "$houdini",
     "plugins": {
-        "houdini-svelte": {}
+        "houdini-svelte": {defaultRouteBlocking: true}
+    },
+    scalars: {
+        DateTime: {
+            type: 'Date',
+            unmarshal(val) {
+                return val ? new Date(val) : null
+            },
+            marshal(date) {
+                return date && date.getTime()
+            }
+        }
     }
 }
 
