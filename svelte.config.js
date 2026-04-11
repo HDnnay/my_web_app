@@ -1,5 +1,5 @@
 import adapter from '@sveltejs/adapter-auto';
-import path from 'path';  // 添加这行
+import {path} from 'houdini';  // 添加这行
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {

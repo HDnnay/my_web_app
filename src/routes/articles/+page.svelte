@@ -3,4 +3,3 @@
 
     let { data }: PageProps = $props();
 </script>
-<h1>用户</h1>
