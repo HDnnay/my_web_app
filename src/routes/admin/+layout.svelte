@@ -4,14 +4,22 @@
     import HeaderNav from '$lib/components/pageHeaderNavs/headerNav.svelte';
     import { browser } from '$app/environment';
     import Sidebar from '$lib/components/sidebars/sidebar.svelte';
+    import { signalRService } from '$lib/services/signalr';
+    import { onMount, onDestroy } from 'svelte';
+    
     let { data, children }: LayoutProps = $props();
-    // 检查登录状态（示例）
-  if (browser) {
-    // const isAdmin = localStorage.getItem('isAdmin') === 'true';
-    // if (!isAdmin) {
-    //   goto('/login');
-    // }
-  }
+    
+    onMount(async () => {
+        if (browser) {
+            await signalRService.startConnection();
+        }
+    });
+    
+    onDestroy(async () => {
+        if (browser) {
+            await signalRService.stopConnection();
+        }
+    });
 </script>
 
 <div class="admin-layout flex flex-col min-h-screen w-full">

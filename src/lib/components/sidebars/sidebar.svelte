@@ -1,10 +1,11 @@
 <script lang="ts">
     import { GetMenuTreeStore } from '$houdini';
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
     import SidebarItem from './sidebarItem.svelte';
     import type { MenuItem } from '$lib/types/menu';
+    import { signalRService } from '$lib/services/signalr';
     
     // 组件属性
     let { 
@@ -23,8 +24,12 @@
     // 当前页面路径
     const currentPath = $derived($page.url.pathname);
 
-    onMount(async () => {
+    // 加载菜单数据
+    async function loadMenuData() {
         try {
+            loading = true;
+            error = null;
+            
             // 使用 Houdini Store 获取菜单数据
             const store = new GetMenuTreeStore();
             const result = await store.fetch();
@@ -47,6 +52,25 @@
         } finally {
             loading = false;
         }
+    }
+
+    // 处理菜单更新事件
+    function handleMenuUpdated() {
+        console.log('收到菜单更新通知，重新加载菜单数据');
+        loadMenuData();
+    }
+
+    onMount(async () => {
+        // 加载菜单数据
+        await loadMenuData();
+        
+        // 监听菜单更新事件
+        signalRService.on('MenuUpdated', handleMenuUpdated);
+    });
+
+    onDestroy(() => {
+        // 移除事件监听器
+        signalRService.off('MenuUpdated', handleMenuUpdated);
     });
 
     // 处理菜单点击
