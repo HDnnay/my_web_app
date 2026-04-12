@@ -25,6 +25,7 @@
         "vite": "^7.3.2"
     },
     "dependencies": {
-        "@fontsource/fira-mono": "^5.2.7"
+        "@fontsource/fira-mono": "^5.2.7",
+        "@microsoft/signalr": "^10.0.0"
     }
 }

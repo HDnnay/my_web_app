@@ -3,6 +3,7 @@
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
+    import SidebarItem from './sidebarItem.svelte';
 
     // 菜单数据
     let menuData = $state<any[]>([]);
@@ -68,48 +69,11 @@
         {:else}
             <ul class="space-y-2">
                 {#each menuData as menu}
-                    <li>
-                        {#if menu.childMenus && menu.childMenus.length > 0}
-                            <!-- 有子菜单的菜单项 -->
-                            <details class="group">
-                                <summary class="flex items-center px-3 py-2 cursor-pointer hover:bg-primary-300 transition-colors {isActiveMenu(menu.path) ? 'bg-gray-700' : ''}">
-                                    <!-- {#if menu.icon}
-                                        <span class="mr-3">{menu.icon}</span>
-                                    {/if} -->
-                                    <span class="flex-1">{menu.name}</span>
-                                    <span class="transform transition-transform group-open:rotate-180">▼</span>
-                                </summary>
-                                <ul class="ml-4 mt-1 space-y-1">
-                                    {#each menu.childMenus as childMenu}
-                                        <li>
-                                            <a 
-                                                href="{childMenu.path}" 
-                                                class="flex items-center px-3 py-2 rounded-lg hover:bg-primary-300 transition-colors {isActiveMenu(childMenu.path) ? 'bg-gray-700' : ''}"
-                                                onclick={() => handleMenuClick(childMenu.path)}
-                                            >
-                                                <!-- {#if childMenu.icon}
-                                                    <span class="mr-3">{childMenu.icon}</span>
-                                                {/if} -->
-                                                <span>{childMenu.name}</span>
-                                            </a>
-                                        </li>
-                                    {/each}
-                                </ul>
-                            </details>
-                        {:else}
-                            <!-- 没有子菜单的菜单项 -->
-                            <a 
-                                href="{menu.path}" 
-                                class="flex items-center px-3 py-2 rounded-lg hover:bg-primary-300 transition-colors {isActiveMenu(menu.path) ? 'bg-gray-700' : ''}"
-                                onclick={() => handleMenuClick(menu.path)}
-                            >
-                                <!-- {#if menu.icon}
-                                    <span class="mr-3">{menu.icon}</span>
-                                {/if} -->
-                                <span>{menu.name}</span>
-                            </a>
-                        {/if}
-                    </li>
+                    <SidebarItem 
+                        menu={menu}
+                        isActiveMenu={isActiveMenu} 
+                        handleMenuClick={handleMenuClick} 
+                    />
                 {/each}
             </ul>
         {/if}

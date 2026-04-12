@@ -65,6 +65,7 @@ type AppMenuDto {
   createdAt: DateTime
   icon: String
   id: ID
+  level: Int
   name: String
   order: Int
   parentId: ID
@@ -188,6 +189,7 @@ input CreateArticleCommandInput {
 
 input CreateMenuCommandInput {
   icon: String
+  level: Int
   name: String!
   order: Int
   parentId: ID
@@ -443,6 +445,7 @@ input UpdateArticleCommandInput {
 input UpdateMenuCommandInput {
   icon: String
   id: UUID!
+  level: Int
   name: String!
   order: Int
   parentId: ID
