@@ -25,7 +25,8 @@
     } = $props();
     
     // 使用菜单数据中的 level 字段计算缩进距离
-    const indentClass = `ml-${(menu.level - 1) * 4}`;
+    const indent = (menu.level - 1) * 16; // 16px 是 1rem 的基础单位
+    const indentStyle = `margin-left: ${indent}px;`;
     
     // 判断是否有子菜单
     const hasChildren = menu.childMenus && menu.childMenus.length > 0;
@@ -36,7 +37,7 @@
         <!-- 有子菜单的菜单项 -->
         <details class="w-full">
             <summary class="flex items-center px-3 py-2 w-full cursor-pointer transition-colors {liHoverClass} {isActiveMenu(menu.path) ? activeClass : ''} group">
-                <div class="{indentClass} flex-1">
+                <div class="flex-1" style={indentStyle}>
                     <!-- {#if menu.icon}
                         <span class="mr-3">{menu.icon}</span>
                     {/if} -->
@@ -63,7 +64,7 @@
             class="flex items-center px-3 py-2 w-full transition-colors {liHoverClass} {isActiveMenu(menu.path) ? activeClass : ''}"
             onclick={() => handleMenuClick(menu.path)}
         >
-            <div class="{indentClass} flex-1">
+            <div class="flex-1" style={indentStyle}>
                 <!-- {#if menu.icon}
                     <span class="mr-3">{menu.icon}</span>
                 {/if} -->
