@@ -4,9 +4,10 @@
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
     import SidebarItem from './sidebarItem.svelte';
+    import type { MenuItem } from '$lib/types/menu';
 
     // 菜单数据
-    let menuData = $state<any[]>([]);
+    let menuData = $state<MenuItem[]>([]);
     let loading = $state(true);
     let error = $state<string | null>(null);
 
@@ -22,10 +23,10 @@
             if (result.data?.menuTree) {
                 menuData = result.data.menuTree;
                 // 按 order 排序
-                menuData.sort((a, b) => (a.order || 0) - (b.order || 0));
-                menuData.forEach(menu => {
+                menuData.sort((a: MenuItem, b: MenuItem) => (a.order || 0) - (b.order || 0));
+                menuData.forEach((menu: MenuItem) => {
                     if (menu.childMenus) {
-                        menu.childMenus.sort((a, b) => (a.order || 0) - (b.order || 0));
+                        menu.childMenus.sort((a: MenuItem, b: MenuItem) => (a.order || 0) - (b.order || 0));
                     }
                 });
             } else {

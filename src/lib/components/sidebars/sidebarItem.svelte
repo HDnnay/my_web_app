@@ -2,14 +2,8 @@
     // 导入自身用于递归
     import SidebarItem from './sidebarItem.svelte';
     
-    // 类型定义
-    interface MenuItem {
-        path: string;
-        name: string;
-        icon?: string;
-        level: number;
-        childMenus?: MenuItem[];
-    }
+    // 导入菜单项类型
+    import type { MenuItem } from '$lib/types/menu';
     
     // 组件属性
     let { 
