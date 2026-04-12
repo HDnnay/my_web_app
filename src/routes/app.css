@@ -1,6 +1,9 @@
 @import '@fontsource/fira-mono';
 @import 'tailwindcss';
 
+/* 重置 body 和 html 的圆角 */
+
+
 /* 为 Tailwind v4 定义自定义颜色变量 */
 @theme{
   --color-primary-50: #f0fdf4;

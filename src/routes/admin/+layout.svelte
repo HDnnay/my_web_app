@@ -14,13 +14,13 @@
   }
 </script>
 
-<div class="admin-layout flex flex-col min-h-screen">
+<div class="admin-layout flex flex-col min-h-screen w-full">
     <!-- 顶部导航菜单 -->
     <HeaderNav />
 
-    <div class="flex flex-1">
+    <div class="flex flex-1 w-full">
         <!-- 左侧侧栏菜单 -->
-        <aside class="w-64 flex-shrink-0">
+        <aside class="w-64 flex-shrink-0 rounded-none flex flex-col">
             <Sidebar />
         </aside>
         

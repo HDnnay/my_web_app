@@ -5,6 +5,15 @@
     import { goto } from '$app/navigation';
     import SidebarItem from './sidebarItem.svelte';
     import type { MenuItem } from '$lib/types/menu';
+    
+    // 组件属性
+    let { 
+        themeColor = 'primary-400',
+        textColor = 'white'
+    }: {
+        themeColor?: string;
+        textColor?: string;
+    } = $props();
 
     // 菜单数据
     let menuData = $state<MenuItem[]>([]);
@@ -53,14 +62,14 @@
     };
 </script>
 
-<div class="sidebar bg-primary-400 text-white w-64 min-h-screen">
+<div class={`sidebar bg-${themeColor} text-${textColor} w-64 min-h-screen flex flex-col`}>
     <!-- 侧边栏标题 -->
     <div class="p-3">
         <h2 class="text-xl font-bold">管理系统</h2>
     </div>
 
     <!-- 菜单内容 -->
-    <nav class="">
+    <nav class="flex-1">
         {#if loading}
             <div class="flex justify-center py-4">
                 <div class="animate-spin h-6 w-6 border-b-2 rounded-full border-white"></div>
@@ -68,12 +77,13 @@
         {:else if error}
             <div class="text-red-400 text-center py-4">{error}</div>
         {:else}
-            <ul class="space-y-2">
+            <ul class="space-y-2 w-full">
                 {#each menuData as menu}
                     <SidebarItem 
                         menu={menu}
                         isActiveMenu={isActiveMenu} 
-                        handleMenuClick={handleMenuClick} 
+                        handleMenuClick={handleMenuClick}
+                        themeColor={themeColor.split('-')[0]} // 提取主颜色名称
                     />
                 {/each}
             </ul>
