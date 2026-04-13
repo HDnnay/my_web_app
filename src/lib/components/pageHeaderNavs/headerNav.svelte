@@ -13,6 +13,5 @@
             <a href="/admin/permissions" class="transition-colors hover:text-white/80">权限管理</a>
         </div>
         
-        <UserMenu />
     </div>
 </nav>
