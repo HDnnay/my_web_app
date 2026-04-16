@@ -2,6 +2,8 @@
     import type { PageProps } from './$types';
     import Pagination from '$lib/components/paginations/pagination.svelte';
     import { goto } from '$app/navigation';
+    // 导入全局确认对话框
+    import { confirm } from '$lib/utils/confirm';
 
     let { data }: PageProps = $props();
     
@@ -18,6 +20,8 @@
             endCursor: null
         }
     });
+
+    let userIdToDelete: string | undefined = undefined;
     
     // 处理页码变化
     const handlePageChange = (page: number) => {
@@ -69,19 +73,36 @@
         // 例如：goto(`/admin/users/${userId}/roles`);
     };
 
+
+
     // 处理删除用户
-    const handleDeleteUser = (userId: string | undefined) => {
+    const handleDeleteUser = async (userId: string | undefined) => {
         if (!userId) return;
         
-        // 这里应该显示删除确认弹窗，然后调用 API 来删除用户
-        if (confirm('确定要删除这个用户吗？')) {
+        // 存储要删除的用户 ID
+        userIdToDelete = userId;
+        
+        // 使用全局确认对话框
+        const confirmed = await confirm({
+            title: '确认删除',
+            message: '确定要删除这个用户吗？此操作不可撤销。',
+            confirmText: '删除',
+            cancelText: '取消'
+        });
+        
+        if (confirmed) {
             console.log(`删除用户 ${userId}`);
             // 这里应该调用 API 来删除用户
             // 例如：await deleteUser(userId);
             // 然后重新加载用户数据
         }
+        
+        // 重置状态
+        userIdToDelete = undefined;
     };
 </script>
+
+
 
 <div class="px-4 sm:px-6 lg:px-8 py-8">
     <h1 class="text-2xl font-bold mb-6 text-gray-900">用户管理</h1>
@@ -101,11 +122,19 @@
             <tbody class="bg-white divide-y divide-gray-200">
                 {#each state.users as user, index}
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user?.name}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user?.email}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user?.userType}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {index + 1 + (state.pagination.currentPage - 1) * state.pagination.itemsPerPage}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {user?.name}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {user?.email}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {user?.userType}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
                             {#if user?.isDisabled}
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                                     禁用
@@ -126,12 +155,12 @@
                             {/if}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button on:click={() => handleEditUser(user?.id)} class="text-white bg-primary hover:bg-primary-400 px-2 py-1 rounded-md mr-2 text-xs">编辑</button>
-                            <button on:click={() => handleToggleStatus(user?.id, user?.isDisabled)} class={`px-2 py-1 rounded-md mr-2 text-xs ${user?.isDisabled ? 'text-green-600 border border-green-600 hover:bg-green-100' : 'text-yellow-600 border border-yellow-600 hover:bg-yellow-100'}`}>
+                            <button onclick={() => handleEditUser(user?.id)} class="text-white bg-primary hover:bg-primary-400 px-2 py-1 rounded-md mr-2 text-xs">编辑</button>
+                            <button onclick={() => handleToggleStatus(user?.id, user?.isDisabled)} class={`px-2 py-1 rounded-md mr-2 text-xs ${user?.isDisabled ? 'text-green-600 border border-green-600 hover:bg-green-100' : 'text-yellow-600 border border-yellow-600 hover:bg-yellow-100'}`}>
                                 {user?.isDisabled ? '启用' : '禁用'}
                             </button>
-                            <button on:click={() => handleAssignRoles(user?.id)} class="text-blue-600 border border-blue-600 hover:bg-blue-100 px-2 py-1 rounded-md mr-2 text-xs">分配角色</button>
-                            <button on:click={() => handleDeleteUser(user?.id)} class="text-red-600 border border-red-600 hover:bg-red-100 px-2 py-1 rounded-md text-xs">删除</button>
+                            <button onclick={() => handleAssignRoles(user?.id)} class="text-blue-600 border border-blue-600 hover:bg-blue-100 px-2 py-1 rounded-md mr-2 text-xs">分配角色</button>
+                            <button onclick={() => handleDeleteUser(user?.id)} class="text-red-600 border border-red-600 hover:bg-red-100 px-2 py-1 rounded-md text-xs">删除</button>
                         </td>
                     </tr>
                 {/each}
