@@ -4,6 +4,8 @@
     import { goto } from '$app/navigation';
     // 导入全局确认对话框
     import { confirm } from '$lib/utils/confirm';
+    // 导入模态框组件
+    import DynamicModal from '$lib/components/common/DynamicModal.svelte';
 
     let { data }: PageProps = $props();
     
@@ -22,6 +24,9 @@
     });
 
     let userIdToDelete: string | undefined = undefined;
+    let showDeleteConfirm = $state(false);
+    let showEditUser = $state(false);
+    let editingUser: any = $state(null);
     
     // 处理页码变化
     const handlePageChange = (page: number) => {
@@ -55,13 +60,52 @@
         // 这里可以添加刷新逻辑
     };
 
+    // 表单数据
+    let editFormData = $state({
+        name: '',
+        email: '',
+        userType: '',
+        isDisabled: false
+    });
+
     // 处理编辑用户
-    const handleEditUser = (userId: string | undefined) => {
-        if (!userId) return;
+    const handleEditUser = (user: any) => {
+        if (!user) return;
         
-        // 这里应该跳转到编辑用户页面
-        console.log(`编辑用户 ${userId}`);
-        // 例如：goto(`/admin/users/${userId}/edit`);
+        // 设置正在编辑的用户
+        editingUser = user;
+        
+        // 初始化表单数据
+        editFormData = {
+            name: user?.name || '',
+            email: user?.email || '',
+            userType: user?.userType || '',
+            isDisabled: user?.isDisabled || false
+        };
+        
+        // 显示编辑模态框
+        showEditUser = true;
+    };
+
+    // 处理保存用户
+    const handleSaveUser = () => {
+        console.log('保存用户信息:', editFormData);
+        console.log('原用户信息:', editingUser);
+        
+        // 这里应该调用 API 来更新用户信息
+        // 例如：await updateUser(editingUser.id, editFormData);
+        // 然后重新加载用户数据
+        
+        // 关闭模态框并重置状态
+        showEditUser = false;
+        editingUser = null;
+    };
+
+    // 处理取消编辑
+    const handleCancelEdit = () => {
+        // 关闭模态框并重置状态
+        showEditUser = false;
+        editingUser = null;
     };
 
     // 处理分配角色
@@ -76,28 +120,34 @@
 
 
     // 处理删除用户
-    const handleDeleteUser = async (userId: string | undefined) => {
+    const handleDeleteUser = (userId: string | undefined) => {
         if (!userId) return;
         
         // 存储要删除的用户 ID
         userIdToDelete = userId;
         
-        // 使用全局确认对话框
-        const confirmed = await confirm({
-            title: '确认删除',
-            message: '确定要删除这个用户吗？此操作不可撤销。',
-            confirmText: '删除',
-            cancelText: '取消'
-        });
-        
-        if (confirmed) {
-            console.log(`删除用户 ${userId}`);
+        // 显示确认模态框
+        showDeleteConfirm = true;
+    };
+
+    // 处理确认删除
+    const handleConfirmDelete = () => {
+        if (userIdToDelete) {
+            console.log(`删除用户 ${userIdToDelete}`);
             // 这里应该调用 API 来删除用户
-            // 例如：await deleteUser(userId);
+            // 例如：await deleteUser(userIdToDelete);
             // 然后重新加载用户数据
         }
         
-        // 重置状态
+        // 关闭模态框并重置状态
+        showDeleteConfirm = false;
+        userIdToDelete = undefined;
+    };
+
+    // 处理取消删除
+    const handleCancelDelete = () => {
+        // 关闭模态框并重置状态
+        showDeleteConfirm = false;
         userIdToDelete = undefined;
     };
 </script>
@@ -155,7 +205,7 @@
                             {/if}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            <button onclick={() => handleEditUser(user?.id)} class="text-white bg-primary hover:bg-primary-400 px-2 py-1 rounded-md mr-2 text-xs">编辑</button>
+                            <button onclick={() => handleEditUser(user)} class="text-white bg-primary hover:bg-primary-400 px-2 py-1 rounded-md mr-2 text-xs">编辑</button>
                             <button onclick={() => handleToggleStatus(user?.id, user?.isDisabled)} class={`px-2 py-1 rounded-md mr-2 text-xs ${user?.isDisabled ? 'text-green-600 border border-green-600 hover:bg-green-100' : 'text-yellow-600 border border-yellow-600 hover:bg-yellow-100'}`}>
                                 {user?.isDisabled ? '启用' : '禁用'}
                             </button>
@@ -175,4 +225,85 @@
         itemsPerPage={state.pagination.itemsPerPage}
         onPageChange={handlePageChange}
     />
+
+
+    <!-- 编辑用户模态框 -->
+    <DynamicModal 
+        show={showEditUser}
+        title={editingUser ? `编辑用户 - ${editingUser.name}` : '编辑用户'}
+        size="lg"
+        type="info"
+        onClose={handleCancelEdit}
+    >
+        <form class="space-y-4" onsubmit={(e) => { e.preventDefault(); handleSaveUser(); }}>
+            <!-- 姓名 -->
+            <div>
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                <input 
+                    id="name"
+                    type="text"
+                    bind:value={editFormData.name}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    required
+                />
+            </div>
+
+            <!-- 邮箱 -->
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                <input 
+                    id="email"
+                    type="email"
+                    bind:value={editFormData.email}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    required
+                />
+            </div>
+
+            <!-- 用户类型 -->
+            <div>
+                <label for="userType" class="block text-sm font-medium text-gray-700 mb-1">用户类型</label>
+                <select 
+                    id="userType"
+                    bind:value={editFormData.userType}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                    <option value="">请选择用户类型</option>
+                    <option value="ADMIN">管理员</option>
+                    <option value="USER">普通用户</option>
+                    <option value="GUEST">访客</option>
+                </select>
+            </div>
+
+            <!-- 状态 -->
+            <div class="flex items-center">
+                <input 
+                    id="isDisabled"
+                    type="checkbox"
+                    bind:checked={editFormData.isDisabled}
+                    class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <label for="isDisabled" class="ml-2 block text-sm text-gray-700">禁用用户</label>
+            </div>
+        </form>
+        
+        <svelte:fragment slot="footer">
+            <div class="flex justify-end space-x-3">
+                <button 
+                    type="button"
+                    class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                    onclick={handleCancelEdit}
+                >
+                    取消
+                </button>
+                <button 
+                    type="button"
+                    class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-600 transition-colors"
+                    onclick={handleSaveUser}
+                >
+                    保存
+                </button>
+            </div>
+        </svelte:fragment>
+    </DynamicModal>
 </div>
